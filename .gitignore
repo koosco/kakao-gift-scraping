@@ -1,2 +1,3 @@
 *.idea
 */__pycache__*
+kakao_gift_scraping/db_config.py
