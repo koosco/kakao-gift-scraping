@@ -12,12 +12,12 @@ PAGE_DOWN_CNT = 3
 class KakaoDriver(object):
     def __init__(self, driver, builder):
         self.driver = driver
-        self.builder = builder
+        self.item_builder = builder
 
         self.category_name = None
         self.sub_category_name = None
 
-    def execute(self):
+    def scrap_all(self):
         """
         driver를 이용해 카카오 선물하기 페이지에서 scraping을 수행
         * category를 전부 순회하며 item을 탐색한다
@@ -35,6 +35,29 @@ class KakaoDriver(object):
                     self.click(CATEGORY_CANCEL_BUTTON)  # cateogory를 선택하지 못했다면 카테고리 선택 창을 닫는다
                 self.sub_category_name = None
             self.category_name = None
+
+    def scrap_category(self, category_idx: int):
+        """
+        하나의 카테고리에 대해 scraping 수행
+        :param category_idx: scrap할 페이지 idx
+        :return: 카테고리에 포함된 항목들
+        """
+        sub_category_size = self.get_second_category_size(category_idx)  # second category 길이
+        for sub_category_idx in range(sub_category_size):
+            sleep(SHORT_TIME)
+            if not self._is_in_black(category_idx, sub_category_idx):
+                # black list에 포함되지 않는 경우에만 다음 페이지를 조회
+                return self.find_items_in_page()  # item 목록을 찾는다
+            else:
+                self.click(CATEGORY_CANCEL_BUTTON)  # cateogory를 선택하지 못했다면 카테고리 선택 창을 닫는다
+
+    def scrap_sub_category(self, category_idx: int, sub_category_idx: int):
+        sleep(SHORT_TIME)
+        if not self._is_in_black(category_idx, sub_category_idx):
+            # black list에 포함되지 않는 경우에만 다음 페이지를 조회
+            return self.find_items_in_page()  # item 목록을 찾는다
+        else:
+            self.click(CATEGORY_CANCEL_BUTTON)  # cateogory를 선택하지 못했다면 카테고리 선택 창을 닫는다
 
     def get_first_category_size(self):
         """
@@ -81,7 +104,7 @@ class KakaoDriver(object):
         return False
 
     def fill_category_builder(self):
-        (self.builder
+        (self.item_builder
          .category(self.category_name)
          .sub_category(self.sub_category_name))
 
@@ -96,15 +119,17 @@ class KakaoDriver(object):
             last_height = new_height
 
     def find_items_in_page(self):
+        items = []
         self.click(ITEM_BUTTON)  # 페이지에 들어가면 item에 대한 항목으로 페이지 기준을 변경
         self.fill_category_builder()  # builder에 category, sub category 이름을 추가
         self.page_down()
-        item_lists = self.driver.find_elements(By.CLASS_NAME, ITEM_LIST)
+        item_lists = self.driver.find_elements(By.CLASS_NAME, ITEM_LIST)  # 각각의 아이템 목록들 (추천 항목 제외)
         for item_list in item_lists:
-            elements = item_list.find_elements(By.CLASS_NAME, ITEM)
-            self.fill_category_builder()
+            elements = item_list.find_elements(By.CLASS_NAME, ITEM)  # 아이템 목록에서 아이템들을 찾음
+            self.fill_category_builder()  # 카테고리 항목을 채우고
             for elem in elements:
-                item = self.find_item(elem)
+                items.append(self.find_item(elem))  # 아이템을 dto로 만듬
+        return items
 
     def find_item(self, element):
         item_image_url = element.find_element(By.CLASS_NAME, ITEM_IMAGE_URL).get_attribute('src')
@@ -112,7 +137,7 @@ class KakaoDriver(object):
         item_name = element.find_element(By.CLASS_NAME, ITEM_NAME).text
         price = element.find_element(By.CLASS_NAME, ITEM_PRICE).text
 
-        return (self.builder
+        return (self.item_builder
                 .item_image_url(item_image_url)
                 .brand_name(brand_name)
                 .item_name(item_name)
