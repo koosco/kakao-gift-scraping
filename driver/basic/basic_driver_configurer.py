@@ -1,12 +1,12 @@
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 
-from basic.basic_driver import WebDriver
+from basic.basic_driver import BasicDriver
 
 
 class BasicDriverConfigurer(object):
     def __init__(self):
-        self.path = ''
+        self.url = ''
         self.headless = False
         self.no_sandbox = False
         self.pop_up = False
@@ -40,4 +40,4 @@ class BasicDriverConfigurer(object):
                     driver.switch_to.window(handle)
                     driver.close()
             driver.switch_to.window(handles[0])
-        return WebDriver(driver)
+        return BasicDriver(driver)

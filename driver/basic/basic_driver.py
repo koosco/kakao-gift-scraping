@@ -4,7 +4,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.common import NoSuchElementException
 
 
-class WebDriver(object):
+class BasicDriver(object):
     def __init__(self, driver):
         self.driver = driver
         self.body = None
@@ -33,8 +33,14 @@ class WebDriver(object):
         print(button.text)
         button.click()
 
-    def find_by_xpath(self, path: str):
+    def xpath(self, path: str):
         try:
             return self.driver.find_element(By.XPATH, path)
         except NoSuchElementException:
             return None
+
+    def page_end(self):
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+    def get_height(self):
+        return self.driver.execute_script("return document.body.scrollHeight")
