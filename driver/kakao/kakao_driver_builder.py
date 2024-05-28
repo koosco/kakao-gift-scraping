@@ -14,8 +14,8 @@ class KakaoDriverBuilder(BasicDriverBuilder):
         self.configurer.url = url
         return self
 
-    def configure(self):
+    def configure(self) -> KakaoDriver:
         driver = super().configure()
+        driver.open_url(self.configurer.url)
         kakao_driver = KakaoDriver(driver, self.item_builder)
-        kakao_driver.open_url(self.configurer.url)
-
+        return kakao_driver
