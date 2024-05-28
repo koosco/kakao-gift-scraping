@@ -44,3 +44,6 @@ class BasicDriver(object):
 
     def _get_height(self):
         return self._driver.execute_script("return document.body.scrollHeight")
+
+    def _class_name(self, class_name: str):
+        return self._driver.find_elements(By.CLASS_NAME, class_name)
