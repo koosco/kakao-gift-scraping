@@ -1,3 +1,7 @@
+import import_django
+
+from item_service.models import *
+
 from basic.basic_driver import BasicDriver
 from kakao.const.xpaths import *
 from kakao.const.black_list import *
@@ -28,10 +32,11 @@ class KakaoDriver(object):
         for category_idx in range(1, category_size+1):
             sub_category_size = self.get_second_category_size(category_idx)  # second category 길이
             for sub_category_idx in range(sub_category_size):
-                sleep(SHORT_TIME)
+                sleep(TIME_SHORT_TIME)
                 if not self.__is_in_black(category_idx, sub_category_idx):
                     # black list에 포함되지 않는 경우에만 다음 페이지를 조회
-                    self.__find_items_in_page()  # item 목록을 찾는다
+                    items = self.__find_items_in_page()  # item 목록을 찾는다
+                    Item.objects.bulk_create(items)
                 else:
                     self._click(XPATH_CATEGORY_CANCEL_BUTTON)  # cateogory를 선택하지 못했다면 카테고리 선택 창을 닫는다
                 self._sub_category_name = None
@@ -46,19 +51,21 @@ class KakaoDriver(object):
         category_idx += 1
         sub_category_size = self.get_second_category_size(category_idx)  # second category 길이
         for sub_category_idx in range(sub_category_size):
-            sleep(SHORT_TIME)
+            sleep(TIME_SHORT_TIME)
             if not self.__is_in_black(category_idx, sub_category_idx):
                 # black list에 포함되지 않는 경우에만 다음 페이지를 조회
-                return self.__find_items_in_page()  # item 목록을 찾는다
+                items = self.__find_items_in_page()  # item 목록을 찾는다
+                Item.objects.bulk_create(items)
             else:
                 self._click(XPATH_CATEGORY_CANCEL_BUTTON)  # cateogory를 선택하지 못했다면 카테고리 선택 창을 닫는다
 
     def scrap_sub_category(self, category_idx: int, sub_category_idx: int):
         category_idx += 1
-        sleep(SHORT_TIME)
+        sleep(TIME_SHORT_TIME)
         if not self.__is_in_black(category_idx, sub_category_idx):
             # black list에 포함되지 않는 경우에만 다음 페이지를 조회
-            return self.__find_items_in_page()  # item 목록을 찾는다
+            items = self.__find_items_in_page()  # item 목록을 찾는다
+            Item.objects.bulk_create(items)
         else:
             self._click(XPATH_CATEGORY_CANCEL_BUTTON)  # cateogory를 선택하지 못했다면 카테고리 선택 창을 닫는다
 
@@ -67,10 +74,10 @@ class KakaoDriver(object):
         첫 번째 카테고리 크기를 계산
         :return: 첫 번째 카테고리 크기
         """
-        self._click(XPATH_CATEGORY_BUTTON)
+        self._click(XPATH_CATEGORY_BUTTON, TIME_VERY_SHORT_TIME)
         res = len(self._driver._xpath(XPATH_CATEGORY_LIST)
                   .find_elements(By.CLASS_NAME, CLASS_CATEGORY_LIST))
-        self._click(XPATH_CATEGORY_CANCEL_BUTTON)
+        self._click(XPATH_CATEGORY_CANCEL_BUTTON, TIME_VERY_SHORT_TIME)
         return res
 
     def get_second_category_size(self, category_idx: int):
@@ -79,11 +86,11 @@ class KakaoDriver(object):
         :param category_idx: 카테고리 인덱스
         :return: 두 번째 카테고리 크기
         """
-        self._click(XPATH_CATEGORY_BUTTON)
-        self._click(XPATH_CATEGORY_ELEMENT.format(i=category_idx))
+        self._click(XPATH_CATEGORY_BUTTON, TIME_VERY_SHORT_TIME)
+        self._click(XPATH_CATEGORY_ELEMENT.format(i=category_idx), TIME_VERY_SHORT_TIME)
         sub_category_list = self._driver._xpath(XPATH_SUB_LIST.format(i=category_idx - 1))
         text_menus = sub_category_list.find_elements(By.CLASS_NAME, CLASS_CATEGORY_LIST)
-        self._click(XPATH_CATEGORY_CANCEL_BUTTON)
+        self._click(XPATH_CATEGORY_CANCEL_BUTTON, TIME_VERY_SHORT_TIME)
         return len(text_menus)
 
     def __is_in_black(self, category_idx: int, sub_category_idx: int) -> bool:
@@ -103,7 +110,7 @@ class KakaoDriver(object):
             return True
         self._sub_category_name = sub_category_name  # black list에 포함되지 않는다면 sub_category_name 설정
         self._click(XPATH_SUB_CATEGORY_ELEMENT.format(i=category_idx - 1, j=sub_category_idx + 1))  # black list에 포함되지 않는다면 sub category 선택
-        sleep(SHORT_TIME)
+        sleep(TIME_SHORT_TIME)
         return False
 
     def __fill_category_builder(self):
@@ -116,7 +123,7 @@ class KakaoDriver(object):
         for _ in range(PAGE_DOWN_CNT):
             self._driver._page_end()
             new_height = self._driver._get_height()
-            sleep(LONG_TIME)
+            sleep(TIME_LONG_TIME)
             if new_height == last_height:
                 break
             last_height = new_height
@@ -147,7 +154,7 @@ class KakaoDriver(object):
                 .price(price)
                 .build())
 
-    def _click(self, path: str, time=SHORT_TIME):
+    def _click(self, path: str, time=TIME_SHORT_TIME):
         sleep(time)
         self._driver._click(path)
         sleep(time)
