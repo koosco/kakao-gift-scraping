@@ -8,6 +8,7 @@ class Item(models.Model):
     item_image_url = models.CharField(max_length=255)
     brand_name = models.CharField(max_length=100)
     category = models.CharField(max_length=100)
+    sub_category = models.CharField(max_length=100, default='')
     option_name = models.CharField(max_length=100, default='')
 
     class Meta:
