@@ -2,10 +2,10 @@ import import_django
 
 from item_service.models import *
 
-from basic.basic_driver import BasicDriver
-from kakao.const.xpaths import *
-from kakao.const.black_list import *
-from kakao.const.class_name import *
+from driver.basic.basic_driver import BasicDriver
+from driver.kakao.const.xpaths import *
+from driver.kakao.const.black_list import *
+from driver.kakao.const.class_name import *
 from driver.driver_const import *
 
 from time import sleep
