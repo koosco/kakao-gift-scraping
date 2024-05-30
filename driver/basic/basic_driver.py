@@ -1,7 +1,9 @@
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.common import NoSuchElementException
+from time import sleep
 
 
 class BasicDriver(object):
@@ -39,8 +41,23 @@ class BasicDriver(object):
         except NoSuchElementException:
             return None
 
-    def _page_end(self):
-        self._driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    # def _page_end(self):
+    #     self._driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+    def _end(self):
+        actions = self._driver.find_element(By.CSS_SELECTOR, 'body')
+        actions.send_keys(Keys.END)
+
+    def _home(self):
+        actions = self._driver.find_element(By.CSS_SELECTOR, 'body')
+        actions.send_keys(Keys.HOME)
+
+    def _page_down(self):
+        actions = self._driver.find_element(By.CSS_SELECTOR, 'body')
+        actions.send_keys(Keys.PAGE_DOWN)
+
+    def go_to_element(self, target):
+        self._driver.execute_script("arguments[0].scrollIntoView();", target)
 
     def _get_height(self):
         return self._driver.execute_script("return document.body.scrollHeight")
