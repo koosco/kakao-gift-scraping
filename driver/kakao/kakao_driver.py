@@ -11,7 +11,7 @@ from driver.driver_const import *
 from time import sleep
 from selenium.webdriver.common.by import By
 
-PAGE_DOWN_CNT = 3
+PAGE_DOWN_CNT = 10
 
 
 class KakaoDriver(object):
