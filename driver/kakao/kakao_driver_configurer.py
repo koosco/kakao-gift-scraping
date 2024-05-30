@@ -1,4 +1,4 @@
-from basic.basic_driver_configurer import BasicDriverConfigurer
+from driver.basic.basic_driver_configurer import BasicDriverConfigurer
 
 
 class KakaoDriverConfigurer(BasicDriverConfigurer):

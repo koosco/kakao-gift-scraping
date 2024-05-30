@@ -1,4 +1,4 @@
-from basic.basic_driver_builder import BasicDriverBuilder
+from driver.basic.basic_driver_builder import BasicDriverBuilder
 from driver.kakao.kakao_driver import KakaoDriver
 from scraping.entity.item_builder import ItemBuilder
 from driver.kakao.kakao_driver_configurer import KakaoDriverConfigurer

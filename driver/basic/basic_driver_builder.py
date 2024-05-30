@@ -1,8 +1,8 @@
-from basic.basic_driver_configurer import BasicDriverConfigurer
+from driver.basic.basic_driver_configurer import BasicDriverConfigurer
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 
-from basic.basic_driver import BasicDriver
+from driver.basic.basic_driver import BasicDriver
 
 
 class BasicDriverBuilder(object):
